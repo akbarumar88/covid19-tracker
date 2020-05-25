@@ -76,8 +76,9 @@ export default class Berita extends Component {
                         <Text
                           style={{
                             ...s.tAngkaBesar,
-                            color: "#e53e3e",
-                            backgroundColor: "#fff5f5",
+                            color:'#3e8ce5',
+                            backgroundColor:'#f5faff',
+                            fontSize: 36,
                           }}
                         >
                           {toCurrency(data ? data.confirmed.value : 0)}
@@ -86,8 +87,9 @@ export default class Berita extends Component {
                       <Text
                         style={{
                           ...s.tStatus,
-                          color: "#e53e3e",
-                          backgroundColor: "#fed7d7",
+                          color: "#3e8ce5",
+                          backgroundColor:'#d7ebfe',
+                          fontSize:18,
                         }}
                       >
                         Terkonfirmasi
@@ -143,8 +145,8 @@ export default class Berita extends Component {
                         <Text
                           style={{
                             ...s.tAngkaBesar,
-                            color: "#718096",
-                            backgroundColor: "#f5faff",
+                            color: "#e53e3e",
+                            backgroundColor: "#fff5f5",
                           }}
                         >
                           {toCurrency(data ? data.deaths.value : 0)}
@@ -153,8 +155,8 @@ export default class Berita extends Component {
                       <Text
                         style={{
                           ...s.tStatus,
-                          color: "#718096",
-                          backgroundColor: "#e2e8f0",
+                          color: "#e53e3e",
+                          backgroundColor: "#fed7d7",
                         }}
                       >
                         Meninggal
@@ -176,6 +178,8 @@ export default class Berita extends Component {
   renderModal() {
     return (
       <Modal
+        animationIn={'zoomIn'}
+        animationOut={'zoomOut'}
         isVisible={this.state.countryModalVisible}
         onBackdropPress={this.closeModal}
         onBackButtonPress={this.closeModal}
@@ -227,13 +231,13 @@ export default class Berita extends Component {
               })
               return (
                 <ScrollView>
-                  {negaraSearch.map(neg => {
+                  {[{name:'Global',iso2:'WorldWide'},...negaraSearch].map(neg => {
                     return (
                       <TouchableNativeFeedback
                         onPress={() => this.setNegara(neg)}
                       >
                         <View style={s.listNegara}>
-                          <Text>
+                          <Text style={{fontSize:16,color:'#444'}}>
                             {neg.name} - {neg.iso2}
                           </Text>
                         </View>
@@ -259,7 +263,7 @@ export default class Berita extends Component {
 
   setNegara = neg => {
     this.setState({
-      country: neg.name,
+      country: neg.name == 'Global' ? '': neg.name,
       countryModalVisible: false,
       cariNegara: "",
     })
@@ -277,8 +281,10 @@ const s = StyleSheet.create({
     fontSize: 28,
     textAlign: "center",
     fontWeight: "bold",
-    fontFamily: "sans-serif-light",
+    // fontFamily: "sans-serif-light",
     paddingVertical: 16,
+    borderTopLeftRadius:5,
+    borderTopRightRadius:5
   },
   tStatus: {
     fontSize: 14,
@@ -286,6 +292,8 @@ const s = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "sans-serif-light",
     paddingVertical: 8,
+    borderBottomLeftRadius:5,
+    borderBottomRightRadius:5
   },
   kotakWrapper: {
     flexDirection: "row",
@@ -294,14 +302,14 @@ const s = StyleSheet.create({
   kotakKiri: {
     flex: 1,
     marginRight: 6,
-    elevation: 4,
-    borderRadius: 0,
+    elevation: 2,
+    borderRadius: 5,
   },
   kotakKanan: {
     flex: 1,
     marginLeft: 6,
-    elevation: 4,
-    borderRadius: 0,
+    elevation: 2,
+    borderRadius: 5,
   },
   judul: {
     fontSize: 18,
@@ -316,9 +324,10 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     backgroundColor: "#eee",
+    borderRadius:5
   },
   listNegara: {
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
   },
 })
