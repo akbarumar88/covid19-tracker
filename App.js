@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,7 +14,7 @@ import {
   View,
   Text,
   StatusBar,
-} from 'react-native';
+} from "react-native";
 
 import {
   Header,
@@ -22,19 +22,23 @@ import {
   Colors,
   DebugInstructions,
   ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import 'react-native-gesture-handler'
-import {NavigationContainer} from '@react-navigation/native'
-import {createStackNavigator} from '@react-navigation/stack'
-import HomeScreen from './src/components/Home'
+} from "react-native/Libraries/NewAppScreen";
+import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import HomeScreen from "./src/components/Home";
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          options={{ header: () => null }}
+          name="Home"
+          component={HomeScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lighter,
   },
   engine: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
   },
   body: {
@@ -57,25 +61,25 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.black,
   },
   sectionDescription: {
     marginTop: 8,
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: "400",
     color: Colors.dark,
   },
   highlight: {
-    fontWeight: '700',
+    fontWeight: "700",
   },
   footer: {
     color: Colors.dark,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     padding: 4,
     paddingRight: 12,
-    textAlign: 'right',
+    textAlign: "right",
   },
 });
 

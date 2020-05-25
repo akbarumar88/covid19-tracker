@@ -5,7 +5,7 @@ export default class Resource extends Component {
   state={
     loading: false,
     error:false,
-    payload: ''
+    payload: '',
   }
 
   static defaultProps = {
@@ -30,6 +30,6 @@ export default class Resource extends Component {
   }
 
   render() {
-    return this.props.children(this.state);
+    return this.props.children({...this.state, refetch:this.fetchData});
   }
 }
