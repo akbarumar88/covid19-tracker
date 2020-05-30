@@ -105,7 +105,7 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator size={38} />
+                          <ActivityIndicator color="#3e8ce5" size={48} />
                         </View>
                       ) : (
                         <Text
@@ -142,7 +142,7 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator size={38} />
+                          <ActivityIndicator color="#38a169" size={38} />
                         </View>
                       ) : (
                         <Text
@@ -174,7 +174,7 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator size={38} />
+                          <ActivityIndicator color="#e53e3e" size={38} />
                         </View>
                       ) : (
                         <Text
