@@ -18,7 +18,7 @@ import AntDesign from "react-native-vector-icons/AntDesign"
 import Modal from "react-native-modal"
 import {} from "react-native-paper"
 import Axios from "axios"
-import Flag from 'react-native-flags'
+import Flag from "react-native-flags"
 
 const BASE = "https://covid19.mathdro.id/api"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
@@ -26,18 +26,22 @@ const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
 export default class Berita extends Component {
   state = {
     country: "",
-    countryIso2: '',
+    countryIso2: "WorldWide",
     countryList: [],
     countryModalVisible: false,
     cariNegara: "",
-    loadingCountry: false
+    loadingCountry: false,
   }
 
   render() {
     const { country, countryIso2 } = this.state
     return (
       <View style={s.Container}>
-        <Modal animationInTiming={100} animationOutTiming={100} isVisible={this.state.loadingCountry}>
+        <Modal
+          animationInTiming={100}
+          animationOutTiming={100}
+          isVisible={this.state.loadingCountry}
+        >
           <View
             style={{
               backgroundColor: "white",
@@ -49,13 +53,13 @@ export default class Berita extends Component {
             }}
           >
             <ActivityIndicator size={40} color="#9C27B0" />
-            <Text style={{ fontSize: 18, marginLeft: 16,color:'#444' }}>Loading...</Text>
+            <Text style={{ fontSize: 18, marginLeft: 16, color: "#444" }}>
+              Loading...
+            </Text>
           </View>
         </Modal>
 
-        <Resource
-          url={empty(country) ? BASE : `${BASE}/countries/${country}`}
-        >
+        <Resource url={empty(country) ? BASE : `${BASE}/countries/${country}`}>
           {({ loading, error, payload: data, refetch }) => {
             if (error) return <Text>{error.message}</Text>
 
@@ -78,9 +82,13 @@ export default class Berita extends Component {
                   {/* Pilih Negara */}
                   <TouchableNativeFeedback onPress={this.openModal}>
                     <View style={{ ...s.picker, marginBottom: 12 }}>
-                      <View style={{flexDirection:'row',alignItems:'center'}}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
                         <Flag code={countryIso2} size={24} />
-                        <Text style={{marginLeft:8}}>{country || "Global"}</Text>
+                        <Text style={{ marginLeft: 8 }}>
+                          {country || "Global"}
+                        </Text>
                       </View>
 
                       <AntDesign name="caretdown" color="#444" />
@@ -216,8 +224,8 @@ export default class Berita extends Component {
     return (
       <Modal
         hideModalContentWhileAnimating={true}
-        animationIn={'zoomIn'}
-        animationOut={'zoomOut'}
+        animationIn={"zoomIn"}
+        animationOut={"zoomOut"}
         isVisible={this.state.countryModalVisible}
         onBackdropPress={this.closeModal}
         onBackButtonPress={this.closeModal}
@@ -242,31 +250,42 @@ export default class Berita extends Component {
             />
           </View>
 
-                <ScrollView>
-                  {[
-                    { name: "Global", iso2: "WorldWide" },
-                    ...negaraSearch,
-                  ].map(neg => {
-                    return (
-                      <TouchableNativeFeedback
-                        onPress={() => this.setNegara(neg)}
+          <ScrollView>
+            {[{ name: "Global", iso2: "WorldWide" }, ...negaraSearch].map(
+              neg => {
+                return (
+                  <TouchableNativeFeedback onPress={() => this.setNegara(neg)}>
+                    <View style={s.listNegara}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
                       >
-                        <View style={s.listNegara}>
-                          <Flag code={neg.iso2} size={24} />
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              color: "#444",
-                              marginLeft: 8
-                            }}
-                          >
-                            {neg.name} - {neg.iso2}
-                          </Text>
-                        </View>
-                      </TouchableNativeFeedback>
-                    )
-                  })}
-                </ScrollView>
+                        <Flag code={neg.iso2} size={24} />
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: "#444",
+                            marginLeft: 8,
+                          }}
+                        >
+                          {neg.name} - {neg.iso2}
+                        </Text>
+                      </View>
+
+                      {/* Kalo Selected */}
+                      {neg.iso2 == this.state.countryIso2 ? (
+                        <Text style={{ fontSize: 16, color: "#999" }}>
+                          (Current)
+                        </Text>
+                      ) : null}
+                    </View>
+                  </TouchableNativeFeedback>
+                )
+              }
+            )}
+          </ScrollView>
         </View>
       </Modal>
     )
@@ -285,20 +304,20 @@ export default class Berita extends Component {
   }
 
   loadCountry = async () => {
-    this.setState({loadingCountry:true})
+    this.setState({ loadingCountry: true })
     try {
       let { data } = await Axios.get(`${BASE}/countries`)
-      
-      this.setState({countryList: data.countries,loadingCountry:false})
+
+      this.setState({ countryList: data.countries, loadingCountry: false })
     } catch (error) {
-      this.setState({loadingCountry:false})
+      this.setState({ loadingCountry: false })
       ToastAndroid.show(error.message, 1000)
     }
   }
 
   setNegara = neg => {
     this.setState({
-      country: neg.name == 'Global' ? '': neg.name,
+      country: neg.name == "Global" ? "" : neg.name,
       countryIso2: neg.iso2,
       countryModalVisible: false,
       cariNegara: "",
@@ -319,8 +338,8 @@ const s = StyleSheet.create({
     fontWeight: "bold",
     // fontFamily: "sans-serif-light",
     paddingVertical: 16,
-    borderTopLeftRadius:5,
-    borderTopRightRadius:5
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
   },
   tStatus: {
     fontSize: 14,
@@ -328,8 +347,8 @@ const s = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "sans-serif-light",
     paddingVertical: 8,
-    borderBottomLeftRadius:5,
-    borderBottomRightRadius:5
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
   },
   kotakWrapper: {
     flexDirection: "row",
@@ -360,12 +379,13 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     backgroundColor: "#e9e9e9",
-    borderRadius:5
+    borderRadius: 5,
   },
   listNegara: {
     paddingHorizontal: 12,
     paddingVertical: 12,
-    flexDirection:'row',
-    alignItems:'center'
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 })
