@@ -16,6 +16,7 @@ import { empty, toCurrency } from "../functions/Functions"
 import AntDesign from "react-native-vector-icons/AntDesign"
 import Modal from "react-native-modal"
 import {} from "react-native-paper"
+import Axios from "axios"
 
 const BASE = "https://covid19.mathdro.id/api"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
@@ -254,11 +255,17 @@ export default class Berita extends Component {
   }
 
   openModal = () => {
+    if (!this.state.countryList.length)
+      this.loadCountry()
     this.setState({ countryModalVisible: true })
   }
 
   closeModal = () => {
     this.setState({ countryModalVisible: false })
+  }
+
+  loadCountry = async () => {
+    Axios.post('')
   }
 
   setNegara = neg => {
@@ -323,7 +330,7 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#eee",
+    backgroundColor: "#e9e9e9",
     borderRadius:5
   },
   listNegara: {

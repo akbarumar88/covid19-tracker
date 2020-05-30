@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import fetch from 'node-fetch'
+import qs from 'qs'
 
 export default class Resource extends Component {
   state = {
@@ -11,6 +13,7 @@ export default class Resource extends Component {
   static defaultProps = {
     url: "",
     params: {},
+    method: 'get'
   };
 
   componentDidMount() {
@@ -24,11 +27,13 @@ export default class Resource extends Component {
   }
 
   fetchData = async () => {
-    const { url, params } = this.props;
+    let { url, params, method } = this.props;
+    method = method.toLowerCase()
 
     this.setState({ loading: true });
     try {
-      let { data } = await Axios.post(url, params);
+      let { data } = await Axios[method](url, params);
+
       this.setState({ payload: data, loading: false });
     } catch (error) {
       this.setState({ error, loading: false });
