@@ -11,7 +11,7 @@ import {
   Dimensions,
   StatusBar,
   ToastAndroid,
-  Modal as RNModal
+  Modal as RNModal,
 } from "react-native"
 import Resource from "../api/Resource"
 import { empty, toCurrency } from "../functions/Functions"
@@ -21,28 +21,28 @@ import {} from "react-native-paper"
 import Axios from "axios"
 import Flag from "react-native-flags"
 import moment from "moment"
-import {LineChart, PieChart} from 'react-native-charts-wrapper'
-import Svg, {Circle} from 'react-native-svg'
+import Svg, { Circle } from "react-native-svg"
+import AnimateNumber from "react-native-animate-number"
 
 const BASE = "https://covid19.mathdro.id/api"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
-const {width: DEVICE_WIDTH} = Dimensions.get('window')
+const { width: DEVICE_WIDTH } = Dimensions.get("window")
 const color = {
   light: {
-    confirm:'#f5faff',
-    recovered: '#f0fff4',
-    death:'#fff5f5'    
+    confirm: "#f5faff",
+    recovered: "#f0fff4",
+    death: "#fff5f5",
   },
   med: {
-    confirm:'#d7ebfe',
-    recovered: '#c6f6d5',
-    death:'#fed7d7'    
+    confirm: "#d7ebfe",
+    recovered: "#c6f6d5",
+    death: "#fed7d7",
   },
   text: {
-    confirm:'#3e8ce5',
-    recovered: '#38a169',
-    death:'#e53e3e'      
-  }
+    confirm: "#3e8ce5",
+    recovered: "#38a169",
+    death: "#e53e3e",
+  },
 }
 
 export default class Berita extends Component {
@@ -96,7 +96,12 @@ export default class Berita extends Component {
                   />
                 }
               >
-                <View style={{ paddingHorizontal: 4, paddingVertical: 5 }}>
+                <View
+                  style={{
+                    paddingHorizontal: 4,
+                    paddingVertical: 5,
+                  }}
+                >
                   <Text style={{ ...s.judul, marginBottom: 12 }}>
                     Overview Statistik
                   </Text>
@@ -105,7 +110,10 @@ export default class Berita extends Component {
                   <TouchableNativeFeedback onPress={this.openModal}>
                     <View style={{ ...s.picker, marginBottom: 12 }}>
                       <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
                       >
                         <Flag code={countryIso2} size={24} />
                         <Text style={{ marginLeft: 8 }}>
@@ -118,8 +126,11 @@ export default class Berita extends Component {
                   </TouchableNativeFeedback>
 
                   {/* Last Update */}
-                  <View style={{marginBottom:8}}>
-                    <Text style={{...s.darktext,fontStyle:'italic'}}>Update Terkini: {moment(data.lastUpdate).format('DD MMM YYYY HH:mm')}</Text>
+                  <View style={{ marginBottom: 8 }}>
+                    <Text style={{ ...s.darktext, fontStyle: "italic" }}>
+                      Update Terkini:{" "}
+                      {moment(data.lastUpdate).format("DD MMM YYYY HH:mm")}
+                    </Text>
                   </View>
 
                   {/* Confirmed, Active */}
@@ -132,19 +143,22 @@ export default class Berita extends Component {
                             backgroundColor: color.light.confirm,
                           }}
                         >
-                          <ActivityIndicator color={color.text.confirm} size={48} />
+                          <ActivityIndicator
+                            color={color.text.confirm}
+                            size={48}
+                          />
                         </View>
                       ) : (
-                        <Text
+                        <AnimateNumber
                           style={{
                             ...s.tAngkaBesar,
                             color: color.text.confirm,
                             backgroundColor: color.light.confirm,
                             fontSize: 36,
                           }}
-                        >
-                          {toCurrency(data ? data.confirmed.value : 0)}
-                        </Text>
+                          value={data ? data.confirmed.value : 0}
+                          formatter={val => toCurrency(val)}
+                        />
                       )}
                       <Text
                         style={{
@@ -169,18 +183,21 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator color={color.text.recovered} size={38} />
+                          <ActivityIndicator
+                            color={color.text.recovered}
+                            size={38}
+                          />
                         </View>
                       ) : (
-                        <Text
+                        <AnimateNumber
                           style={{
                             ...s.tAngkaBesar,
                             color: color.text.recovered,
                             backgroundColor: color.light.recovered,
                           }}
-                        >
-                          {toCurrency(data ? data.recovered.value : 0)}
-                        </Text>
+                          value={data ? data.recovered.value : 0}
+                          formatter={val => toCurrency(val)}
+                        />
                       )}
                       <Text
                         style={{
@@ -201,18 +218,21 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator color={color.text.death} size={38} />
+                          <ActivityIndicator
+                            color={color.text.death}
+                            size={38}
+                          />
                         </View>
                       ) : (
-                        <Text
+                        <AnimateNumber
                           style={{
                             ...s.tAngkaBesar,
                             color: color.text.death,
                             backgroundColor: color.light.death,
                           }}
-                        >
-                          {toCurrency(data ? data.deaths.value : 0)}
-                        </Text>
+                          value={data ? data.deaths.value : 0}
+                          formatter={val => toCurrency(val)}
+                        />
                       )}
                       <Text
                         style={{
@@ -284,7 +304,10 @@ export default class Berita extends Component {
             {[{ name: "Global", iso2: "WorldWide" }, ...negaraSearch].map(
               neg => {
                 return (
-                  <TouchableNativeFeedback onPress={() => this.setNegara(neg)} key={neg.iso2}>
+                  <TouchableNativeFeedback
+                    onPress={() => this.setNegara(neg)}
+                    key={neg.iso2}
+                  >
                     <View style={s.listNegara}>
                       <View
                         style={{
@@ -305,8 +328,14 @@ export default class Berita extends Component {
                       </View>
 
                       {/* Kalo Selected */}
-                      {neg.iso2 == this.state.countryIso2 ? (
-                        <Text style={{ fontSize: 16, color: "#999" }}>
+                      {neg.iso2 == this.state.countryIso2 &&
+                      !empty(neg.iso2) ? (
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            color: "#999",
+                          }}
+                        >
                           (Current)
                         </Text>
                       ) : null}
@@ -321,27 +350,38 @@ export default class Berita extends Component {
     )
   }
 
-  renderChart=(data)=>{
+  renderChart = data => {
     // Data
     let total = data ? data.confirmed.value : 0
     let recovered = data ? data.recovered.value : 0
     let death = data ? data.deaths.value : 0
-    let deathPercentage = death/total *100
-    let recoveredPercentage = recovered/total*100
+    let deathPercentage = (death / total) * 100
+    let recoveredPercentage = (recovered / total) * 100
+    // console.warn({ deathPercentage, recoveredPercentage })
 
     let deathMinusMargin = this.getMinusMargin(deathPercentage)
-    let recoveredMinusMargin =  this.getMinusMargin(recoveredPercentage)
+    let recoveredMinusMargin = this.getMinusMargin(recoveredPercentage)
 
-    let size = DEVICE_WIDTH/3
+    let size = DEVICE_WIDTH / 3
     let strokeWidth = 10
     let radius = (size - strokeWidth * 2) / 2
-    let keliling = Math.PI * radius*2
+    let keliling = Math.PI * radius * 2
     return (
       <>
-        <View style={{ marginTop: 12, backgroundColor: "white",flexDirection:'row',justifyContent:'space-around' }}>
+        <View
+          style={{
+            marginTop: 12,
+            flexDirection: "row",
+            justifyContent: "space-around",
+            borderRadius: 5,
+            borderColor: "#ddd",
+            borderWidth: 1,
+            paddingVertical: 16,
+          }}
+        >
           {/* SVG Sembuh */}
-          <View style={{alignItems:'center'}}>
-            <Svg width={size} height={size} >
+          <View style={{ alignItems: "center" }}>
+            <Svg width={size} height={size}>
               <Circle
                 stroke={color.text.recovered}
                 cx={radius + 10}
@@ -349,7 +389,7 @@ export default class Berita extends Component {
                 r={radius}
                 strokeWidth={strokeWidth}
                 strokeDasharray={`${keliling} ${keliling}`}
-                strokeDashoffset={100}
+                strokeDashoffset={0}
               />
               <Circle
                 stroke={color.med.recovered}
@@ -358,10 +398,12 @@ export default class Berita extends Component {
                 r={radius}
                 strokeWidth={strokeWidth}
                 strokeDasharray={[keliling, keliling]}
-                strokeDashoffset={recoveredPercentage * keliling}
+                strokeDashoffset={(recoveredPercentage / 100) * keliling}
               />
 
-              <Text
+              <AnimateNumber
+                value={recoveredPercentage || 0}
+                formatter={val => `${toCurrency(val)} %`}
                 style={{
                   marginLeft: radius - recoveredMinusMargin,
                   marginTop: radius - 5,
@@ -369,16 +411,18 @@ export default class Berita extends Component {
                   fontWeight: "bold",
                   fontFamily: "sans-serif-light",
                 }}
-              >
-                {toCurrency(recoveredPercentage, 1)} %
-              </Text>
+              />
             </Svg>
-            <Text style={{...s.medium,marginTop:4,color:'#444'}}>Persentase Sembuh</Text>
-            <Text style={{color:'#999',fontSize:13}}>Dari Total Kasus</Text>
+            <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
+              Persentase Sembuh
+            </Text>
+            <Text style={{ color: "#999", fontSize: 13 }}>
+              Dari Total Kasus
+            </Text>
           </View>
 
           {/* SVG Meninggal */}
-          <View style={{alignItems:'center'}}>
+          <View style={{ alignItems: "center" }}>
             <Svg width={size} height={size}>
               <Circle
                 stroke={color.text.death}
@@ -396,10 +440,12 @@ export default class Berita extends Component {
                 r={radius}
                 strokeWidth={strokeWidth}
                 strokeDasharray={[keliling, keliling]}
-                strokeDashoffset={deathPercentage * keliling}
+                strokeDashoffset={(deathPercentage / 100) * keliling}
               />
 
-              <Text
+              <AnimateNumber
+                value={deathPercentage || 0}
+                formatter={val => `${toCurrency(val)} %`}
                 style={{
                   marginLeft: radius - deathMinusMargin,
                   marginTop: radius - 5,
@@ -407,12 +453,14 @@ export default class Berita extends Component {
                   fontWeight: "bold",
                   fontFamily: "sans-serif-light",
                 }}
-              >
-                {toCurrency(deathPercentage, 1)} %
-              </Text>
+              />
             </Svg>
-            <Text style={{...s.medium,marginTop:4,color:'#444'}}>Persentase Kematian</Text>
-            <Text style={{color:'#999',fontSize:13}}>Dari Total Kasus</Text>
+            <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
+              Persentase Kematian
+            </Text>
+            <Text style={{ color: "#999", fontSize: 13 }}>
+              Dari Total Kasus
+            </Text>
           </View>
         </View>
       </>
@@ -420,21 +468,20 @@ export default class Berita extends Component {
   }
 
   getMinusMargin = (val = 0) => {
-
     let str = Math.floor(val).toString()
     switch (str.length) {
       case 1:
-        return 12
+        return 5
 
-        case 2:
-        return 20
+      case 2:
+        return 13
 
-        case 3:
-        return 28 
-    
+      case 3:
+        return 21
+
       default:
-        return 20
-        break;
+        return 13
+        break
     }
   }
 
@@ -536,13 +583,13 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
   },
   darktext: {
-    color: '#444'
+    color: "#444",
   },
   chart: {
-    height: 300
+    height: 300,
   },
   medium: {
-    fontWeight:'bold',
-    fontFamily:'sans-serif-light'
-  }
+    fontWeight: "bold",
+    fontFamily: "sans-serif-light",
+  },
 })
