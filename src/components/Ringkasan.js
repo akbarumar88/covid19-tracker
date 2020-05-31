@@ -11,6 +11,7 @@ import {
   Dimensions,
   StatusBar,
   ToastAndroid,
+  Modal as RNModal
 } from "react-native"
 import Resource from "../api/Resource"
 import { empty, toCurrency } from "../functions/Functions"
@@ -19,9 +20,29 @@ import Modal from "react-native-modal"
 import {} from "react-native-paper"
 import Axios from "axios"
 import Flag from "react-native-flags"
+import moment from "moment"
+import {ProgressChart,PieChart} from 'react-native-chart-kit'
 
 const BASE = "https://covid19.mathdro.id/api"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
+const DEVICE_WIDTH = Dimensions.get('window').width
+const color = {
+  light: {
+    confirm:'#f5faff',
+    recovered: '#f0fff4',
+    death:'#fff5f5'    
+  },
+  med: {
+    confirm:'#d7ebfe',
+    recovered: '#c6f6d5',
+    death:'#fed7d7'    
+  },
+  text: {
+    confirm:'#3e8ce5',
+    recovered: '#38a169',
+    death:'#e53e3e'      
+  }
+}
 
 export default class Berita extends Component {
   state = {
@@ -38,8 +59,8 @@ export default class Berita extends Component {
     return (
       <View style={s.Container}>
         <Modal
-          animationInTiming={100}
-          animationOutTiming={100}
+          animationInTiming={1}
+          animationOutTiming={1}
           isVisible={this.state.loadingCountry}
         >
           <View
@@ -95,6 +116,11 @@ export default class Berita extends Component {
                     </View>
                   </TouchableNativeFeedback>
 
+                  {/* Last Update */}
+                  <View style={{marginBottom:8}}>
+                    <Text style={{...s.darktext,fontStyle:'italic'}}>Update Terkini: {moment(data.lastUpdate).format('DD MMM YYYY HH:mm')}</Text>
+                  </View>
+
                   {/* Confirmed, Active */}
                   <View style={{ ...s.kotakWrapper }}>
                     <View style={{ ...s.kotakKiri, marginRight: 0 }}>
@@ -102,17 +128,17 @@ export default class Berita extends Component {
                         <View
                           style={{
                             paddingVertical: 16,
-                            backgroundColor: "#f7f7f7",
+                            backgroundColor: color.light.confirm,
                           }}
                         >
-                          <ActivityIndicator color="#3e8ce5" size={48} />
+                          <ActivityIndicator color={color.text.confirm} size={48} />
                         </View>
                       ) : (
                         <Text
                           style={{
                             ...s.tAngkaBesar,
-                            color: "#3e8ce5",
-                            backgroundColor: "#f5faff",
+                            color: color.text.confirm,
+                            backgroundColor: color.light.confirm,
                             fontSize: 36,
                           }}
                         >
@@ -122,8 +148,8 @@ export default class Berita extends Component {
                       <Text
                         style={{
                           ...s.tStatus,
-                          color: "#3e8ce5",
-                          backgroundColor: "#d7ebfe",
+                          color: color.text.confirm,
+                          backgroundColor: color.med.confirm,
                           fontSize: 18,
                         }}
                       >
@@ -142,14 +168,14 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator color="#38a169" size={38} />
+                          <ActivityIndicator color={color.text.recovered} size={38} />
                         </View>
                       ) : (
                         <Text
                           style={{
                             ...s.tAngkaBesar,
-                            color: "#38a169",
-                            backgroundColor: "#f0fff4",
+                            color: color.text.recovered,
+                            backgroundColor: color.light.recovered,
                           }}
                         >
                           {toCurrency(data ? data.recovered.value : 0)}
@@ -158,8 +184,8 @@ export default class Berita extends Component {
                       <Text
                         style={{
                           ...s.tStatus,
-                          color: "#38a169",
-                          backgroundColor: "#c6f6d5",
+                          color: color.text.recovered,
+                          backgroundColor: color.med.recovered,
                         }}
                       >
                         Sembuh
@@ -174,14 +200,14 @@ export default class Berita extends Component {
                             backgroundColor: "#f7f7f7",
                           }}
                         >
-                          <ActivityIndicator color="#e53e3e" size={38} />
+                          <ActivityIndicator color={color.text.death} size={38} />
                         </View>
                       ) : (
                         <Text
                           style={{
                             ...s.tAngkaBesar,
-                            color: "#e53e3e",
-                            backgroundColor: "#fff5f5",
+                            color: color.text.death,
+                            backgroundColor: color.light.death,
                           }}
                         >
                           {toCurrency(data ? data.deaths.value : 0)}
@@ -190,14 +216,17 @@ export default class Berita extends Component {
                       <Text
                         style={{
                           ...s.tStatus,
-                          color: "#e53e3e",
-                          backgroundColor: "#fed7d7",
+                          color: color.text.death,
+                          backgroundColor: color.med.death,
                         }}
                       >
                         Meninggal
                       </Text>
                     </View>
                   </View>
+
+                  {/* Chart */}
+                  {this.renderChart(data)}
                 </View>
               </ScrollView>
             )
@@ -254,7 +283,7 @@ export default class Berita extends Component {
             {[{ name: "Global", iso2: "WorldWide" }, ...negaraSearch].map(
               neg => {
                 return (
-                  <TouchableNativeFeedback onPress={() => this.setNegara(neg)}>
+                  <TouchableNativeFeedback onPress={() => this.setNegara(neg)} key={neg.iso2}>
                     <View style={s.listNegara}>
                       <View
                         style={{
@@ -288,6 +317,85 @@ export default class Berita extends Component {
           </ScrollView>
         </View>
       </Modal>
+    )
+  }
+
+  renderChart=(data)=>{
+    const chartConfig = {
+      backgroundGradientFrom: "#f9f9f9",
+      backgroundGradientTo: "#f9f9f9",
+      decimalPlaces: 2, // optional, defaults to 2dp
+      color: (opacity = 1) => `rgba(229, 62, 62, ${opacity})`,
+      labelColor: (opacity = 1) => `rgba(68, 68, 68, ${opacity})`,
+    }
+
+    let dataDisplay = [
+      {
+        name: "Seoul",
+        population: 21500000,
+        color: "rgba(131, 167, 234, 1)",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15
+      },
+      {
+        name: "Toronto",
+        population: 2800000,
+        color: "#F00",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15
+      },
+      {
+        name: "Beijing",
+        population: 527612,
+        color: "red",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15
+      },
+      {
+        name: "New York",
+        population: 8538000,
+        color: "#ffffff",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15
+      },
+      {
+        name: "Moscow",
+        population: 11920000,
+        color: "rgb(0, 0, 255)",
+        legendFontColor: "#7F7F7F",
+        legendFontSize: 15
+      }
+    ];
+    return (
+      <>
+        <View style={{ marginTop: 12 }} />
+          {/* <ProgressChart
+            data={dataDisplay}
+            width={DEVICE_WIDTH - 24}
+            height={150}
+            strokeWidth={16}
+            radius={40}
+            chartConfig={chartConfig}
+            hideLegend={false}
+            paddingLeft={15}
+            style={{
+              borderRadius: 16,
+              elevation: 1,
+              margin: 0,
+              padding: 0
+            }}
+          /> */}
+          <PieChart
+            data={dataDisplay}
+            width={DEVICE_HEIGHT-24}
+            height={150}
+            chartConfig={chartConfig}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+          />
+      </>
     )
   }
 
@@ -388,4 +496,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  darktext: {
+    color: '#444'
+  }
 })
