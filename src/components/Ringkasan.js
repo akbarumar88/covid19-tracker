@@ -21,11 +21,12 @@ import {} from "react-native-paper"
 import Axios from "axios"
 import Flag from "react-native-flags"
 import moment from "moment"
-import {ProgressChart,PieChart} from 'react-native-chart-kit'
+import {LineChart, PieChart} from 'react-native-charts-wrapper'
+import Svg, {Circle} from 'react-native-svg'
 
 const BASE = "https://covid19.mathdro.id/api"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
-const DEVICE_WIDTH = Dimensions.get('window').width
+const {width: DEVICE_WIDTH} = Dimensions.get('window')
 const color = {
   light: {
     confirm:'#f5faff',
@@ -321,82 +322,120 @@ export default class Berita extends Component {
   }
 
   renderChart=(data)=>{
-    const chartConfig = {
-      backgroundGradientFrom: "#f9f9f9",
-      backgroundGradientTo: "#f9f9f9",
-      decimalPlaces: 2, // optional, defaults to 2dp
-      color: (opacity = 1) => `rgba(229, 62, 62, ${opacity})`,
-      labelColor: (opacity = 1) => `rgba(68, 68, 68, ${opacity})`,
-    }
+    // Data
+    let total = data ? data.confirmed.value : 0
+    let recovered = data ? data.recovered.value : 0
+    let death = data ? data.deaths.value : 0
+    let deathPercentage = death/total *100
+    let recoveredPercentage = recovered/total*100
 
-    let dataDisplay = [
-      {
-        name: "Seoul",
-        population: 21500000,
-        color: "rgba(131, 167, 234, 1)",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15
-      },
-      {
-        name: "Toronto",
-        population: 2800000,
-        color: "#F00",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15
-      },
-      {
-        name: "Beijing",
-        population: 527612,
-        color: "red",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15
-      },
-      {
-        name: "New York",
-        population: 8538000,
-        color: "#ffffff",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15
-      },
-      {
-        name: "Moscow",
-        population: 11920000,
-        color: "rgb(0, 0, 255)",
-        legendFontColor: "#7F7F7F",
-        legendFontSize: 15
-      }
-    ];
+    let deathMinusMargin = this.getMinusMargin(deathPercentage)
+    let recoveredMinusMargin =  this.getMinusMargin(recoveredPercentage)
+
+    let size = DEVICE_WIDTH/3
+    let strokeWidth = 10
+    let radius = (size - strokeWidth * 2) / 2
+    let keliling = Math.PI * radius*2
     return (
       <>
-        <View style={{ marginTop: 12 }} />
-          {/* <ProgressChart
-            data={dataDisplay}
-            width={DEVICE_WIDTH - 24}
-            height={150}
-            strokeWidth={16}
-            radius={40}
-            chartConfig={chartConfig}
-            hideLegend={false}
-            paddingLeft={15}
-            style={{
-              borderRadius: 16,
-              elevation: 1,
-              margin: 0,
-              padding: 0
-            }}
-          /> */}
-          <PieChart
-            data={dataDisplay}
-            width={DEVICE_HEIGHT-24}
-            height={150}
-            chartConfig={chartConfig}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute
-          />
+        <View style={{ marginTop: 12, backgroundColor: "white",flexDirection:'row',justifyContent:'space-around' }}>
+          {/* SVG Sembuh */}
+          <View style={{alignItems:'center'}}>
+            <Svg width={size} height={size} >
+              <Circle
+                stroke={color.text.recovered}
+                cx={radius + 10}
+                cy={radius + 10}
+                r={radius}
+                strokeWidth={strokeWidth}
+                strokeDasharray={`${keliling} ${keliling}`}
+                strokeDashoffset={100}
+              />
+              <Circle
+                stroke={color.med.recovered}
+                cx={radius + 10}
+                cy={radius + 10}
+                r={radius}
+                strokeWidth={strokeWidth}
+                strokeDasharray={[keliling, keliling]}
+                strokeDashoffset={recoveredPercentage * keliling}
+              />
+
+              <Text
+                style={{
+                  marginLeft: radius - recoveredMinusMargin,
+                  marginTop: radius - 5,
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  fontFamily: "sans-serif-light",
+                }}
+              >
+                {toCurrency(recoveredPercentage, 1)} %
+              </Text>
+            </Svg>
+            <Text style={{...s.medium,marginTop:4,color:'#444'}}>Persentase Sembuh</Text>
+            <Text style={{color:'#999',fontSize:13}}>Dari Total Kasus</Text>
+          </View>
+
+          {/* SVG Meninggal */}
+          <View style={{alignItems:'center'}}>
+            <Svg width={size} height={size}>
+              <Circle
+                stroke={color.text.death}
+                cx={radius + 10}
+                cy={radius + 10}
+                r={radius}
+                strokeWidth={strokeWidth}
+                strokeDasharray={`${keliling} ${keliling}`}
+                strokeDashoffset={0}
+              />
+              <Circle
+                stroke={color.med.death}
+                cx={radius + 10}
+                cy={radius + 10}
+                r={radius}
+                strokeWidth={strokeWidth}
+                strokeDasharray={[keliling, keliling]}
+                strokeDashoffset={deathPercentage * keliling}
+              />
+
+              <Text
+                style={{
+                  marginLeft: radius - deathMinusMargin,
+                  marginTop: radius - 5,
+                  fontSize: 22,
+                  fontWeight: "bold",
+                  fontFamily: "sans-serif-light",
+                }}
+              >
+                {toCurrency(deathPercentage, 1)} %
+              </Text>
+            </Svg>
+            <Text style={{...s.medium,marginTop:4,color:'#444'}}>Persentase Kematian</Text>
+            <Text style={{color:'#999',fontSize:13}}>Dari Total Kasus</Text>
+          </View>
+        </View>
       </>
     )
+  }
+
+  getMinusMargin = (val = 0) => {
+
+    let str = Math.floor(val).toString()
+    switch (str.length) {
+      case 1:
+        return 12
+
+        case 2:
+        return 20
+
+        case 3:
+        return 28 
+    
+      default:
+        return 20
+        break;
+    }
   }
 
   openModal = async () => {
@@ -498,5 +537,12 @@ const s = StyleSheet.create({
   },
   darktext: {
     color: '#444'
+  },
+  chart: {
+    height: 300
+  },
+  medium: {
+    fontWeight:'bold',
+    fontFamily:'sans-serif-light'
   }
 })
