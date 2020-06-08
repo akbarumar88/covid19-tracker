@@ -59,6 +59,7 @@ export default class Berita extends Component {
     const { country, countryIso2 } = this.state
     return (
       <View style={s.Container}>
+        {/* Loading Progress */}
         <Modal
           animationInTiming={1}
           animationOutTiming={1}
@@ -87,6 +88,9 @@ export default class Berita extends Component {
 
             return (
               <ScrollView
+                style={{
+                  paddingHorizontal: 8,
+                }}
                 refreshControl={
                   <RefreshControl
                     onRefresh={() => {
@@ -99,7 +103,7 @@ export default class Berita extends Component {
                 <View
                   style={{
                     paddingHorizontal: 4,
-                    paddingVertical: 5,
+                    paddingVertical: 12,
                   }}
                 >
                   <Text style={{ ...s.judul, marginBottom: 12 }}>
@@ -125,8 +129,16 @@ export default class Berita extends Component {
                     </View>
                   </TouchableNativeFeedback>
 
+                  {/* hashTag */}
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
+                      <Text style={{...s.hashTag, color:'#333'}}>#SiagaCOVID19</Text>
+                      <Text style={{...s.hashTag, color:'#777',marginLeft:12}}>#DiRumahAja</Text>
+                    </View>
+                  </ScrollView>
+
                   {/* Last Update */}
-                  <View style={{ marginBottom: 8 }}>
+                  <View style={{ marginVertical: 8 }}>
                     <Text style={{ ...s.darktext, fontStyle: "italic" }}>
                       Update Terkini:{" "}
                       {moment(data.lastUpdate).format("DD MMM YYYY HH:mm")}
@@ -583,8 +595,6 @@ export default class Berita extends Component {
 
 const s = StyleSheet.create({
   Container: {
-    paddingHorizontal: 8,
-    paddingTop: 16,
     backgroundColor: "#f9f9f9",
     flex: 1,
   },
@@ -654,4 +664,9 @@ const s = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: "sans-serif-light",
   },
+  hashTag: {
+    fontWeight:'bold',
+    // fontFamily: "sans-serif-light",
+    fontSize: 32
+  }
 })
