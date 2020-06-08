@@ -355,12 +355,17 @@ export default class Berita extends Component {
     let total = data ? data.confirmed.value : 0
     let recovered = data ? data.recovered.value : 0
     let death = data ? data.deaths.value : 0
+    let treated = data
+      ? data.confirmed.value - (data.recovered.value + data.deaths.value)
+      : 0
     let deathPercentage = (death / total) * 100
     let recoveredPercentage = (recovered / total) * 100
+    let treatedPercentage = (treated/total)*100
     // console.warn({ deathPercentage, recoveredPercentage })
 
     let deathMinusMargin = this.getMinusMargin(deathPercentage)
     let recoveredMinusMargin = this.getMinusMargin(recoveredPercentage)
+    let treatedMinusMargin = this.getMinusMargin(treatedPercentage)
 
     let size = DEVICE_WIDTH / 3
     let strokeWidth = 10
@@ -370,97 +375,154 @@ export default class Berita extends Component {
       <>
         <View
           style={{
-            marginTop: 12,
-            flexDirection: "row",
-            justifyContent: "space-around",
             borderRadius: 5,
             borderColor: "#ddd",
             borderWidth: 1,
             paddingVertical: 16,
+            marginTop:12
           }}
         >
-          {/* SVG Sembuh */}
-          <View style={{ alignItems: "center" }}>
-            <Svg width={size} height={size}>
-              <Circle
-                stroke={color.text.recovered}
-                cx={radius + 10}
-                cy={radius + 10}
-                r={radius}
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${keliling} ${keliling}`}
-                strokeDashoffset={0}
-              />
-              <Circle
-                stroke={color.med.recovered}
-                cx={radius + 10}
-                cy={radius + 10}
-                r={radius}
-                strokeWidth={strokeWidth}
-                strokeDasharray={[keliling, keliling]}
-                strokeDashoffset={(recoveredPercentage / 100) * keliling}
-              />
+          {/* Wrapper Sembuh & Kematian */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+            }}
+          >
+            {/* SVG Sembuh */}
+            <View style={{ alignItems: "center" }}>
+              <Svg width={size} height={size}>
+                <Circle
+                  stroke={color.text.recovered}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${keliling} ${keliling}`}
+                  strokeDashoffset={0}
+                />
+                <Circle
+                  stroke={color.med.recovered}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={[keliling, keliling]}
+                  strokeDashoffset={(recoveredPercentage / 100) * keliling}
+                />
 
-              <AnimateNumber
-                value={recoveredPercentage || 0}
-                formatter={val => `${toCurrency(val)} %`}
-                style={{
-                  marginLeft: radius - recoveredMinusMargin,
-                  marginTop: radius - 5,
-                  fontSize: 22,
-                  fontWeight: "bold",
-                  fontFamily: "sans-serif-light",
-                }}
-              />
-            </Svg>
-            <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
-              Persentase Sembuh
-            </Text>
-            <Text style={{ color: "#999", fontSize: 13 }}>
-              Dari Total Kasus
-            </Text>
+                <AnimateNumber
+                  value={recoveredPercentage || 0}
+                  formatter={val => `${toCurrency(val)} %`}
+                  style={{
+                    marginLeft: radius - recoveredMinusMargin,
+                    marginTop: radius - 5,
+                    fontSize: 22,
+                    fontWeight: "bold",
+                    fontFamily: "sans-serif-light",
+                  }}
+                />
+              </Svg>
+              <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
+                Persentase Sembuh
+              </Text>
+              <Text style={{ color: "#999", fontSize: 13 }}>
+                Dari Total Kasus
+              </Text>
+            </View>
+
+            {/* SVG Meninggal */}
+            <View style={{ alignItems: "center" }}>
+              <Svg width={size} height={size}>
+                <Circle
+                  stroke={color.text.death}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${keliling} ${keliling}`}
+                  strokeDashoffset={0}
+                />
+                <Circle
+                  stroke={color.med.death}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={[keliling, keliling]}
+                  strokeDashoffset={(deathPercentage / 100) * keliling}
+                />
+
+                <AnimateNumber
+                  value={deathPercentage || 0}
+                  formatter={val => `${toCurrency(val)} %`}
+                  style={{
+                    marginLeft: radius - deathMinusMargin,
+                    marginTop: radius - 5,
+                    fontSize: 22,
+                    fontWeight: "bold",
+                    fontFamily: "sans-serif-light",
+                  }}
+                />
+              </Svg>
+              <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
+                Persentase Kematian
+              </Text>
+              <Text style={{ color: "#999", fontSize: 13 }}>
+                Dari Total Kasus
+              </Text>
+            </View>
           </View>
 
-          {/* SVG Meninggal */}
-          <View style={{ alignItems: "center" }}>
-            <Svg width={size} height={size}>
-              <Circle
-                stroke={color.text.death}
-                cx={radius + 10}
-                cy={radius + 10}
-                r={radius}
-                strokeWidth={strokeWidth}
-                strokeDasharray={`${keliling} ${keliling}`}
-                strokeDashoffset={0}
-              />
-              <Circle
-                stroke={color.med.death}
-                cx={radius + 10}
-                cy={radius + 10}
-                r={radius}
-                strokeWidth={strokeWidth}
-                strokeDasharray={[keliling, keliling]}
-                strokeDashoffset={(deathPercentage / 100) * keliling}
-              />
+          {/* Wrapper Dirawat */}
+          <View
+            style={{
+              marginTop: 12,
+              flexDirection: "row",
+              justifyContent: "space-around",
+            }}
+          >
+            {/* SVG Dirawat */}
+            <View style={{ alignItems: "center" }}>
+              <Svg width={size} height={size}>
+                <Circle
+                  stroke={color.text.confirm}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={`${keliling} ${keliling}`}
+                  strokeDashoffset={0}
+                />
+                <Circle
+                  stroke={color.med.confirm}
+                  cx={radius + 10}
+                  cy={radius + 10}
+                  r={radius}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={[keliling, keliling]}
+                  strokeDashoffset={(treatedPercentage / 100) * keliling}
+                />
 
-              <AnimateNumber
-                value={deathPercentage || 0}
-                formatter={val => `${toCurrency(val)} %`}
-                style={{
-                  marginLeft: radius - deathMinusMargin,
-                  marginTop: radius - 5,
-                  fontSize: 22,
-                  fontWeight: "bold",
-                  fontFamily: "sans-serif-light",
-                }}
-              />
-            </Svg>
-            <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
-              Persentase Kematian
-            </Text>
-            <Text style={{ color: "#999", fontSize: 13 }}>
-              Dari Total Kasus
-            </Text>
+                <AnimateNumber
+                  value={treatedPercentage || 0}
+                  formatter={val => `${toCurrency(val)} %`}
+                  style={{
+                    marginLeft: radius - treatedMinusMargin,
+                    marginTop: radius - 5,
+                    fontSize: 22,
+                    fontWeight: "bold",
+                    fontFamily: "sans-serif-light",
+                  }}
+                />
+              </Svg>
+              <Text style={{ ...s.medium, marginTop: 4, color: "#444" }}>
+                Persentase Dirawat
+              </Text>
+              <Text style={{ color: "#999", fontSize: 13 }}>
+                Dari Total Kasus
+              </Text>
+            </View>
           </View>
         </View>
       </>
