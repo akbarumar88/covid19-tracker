@@ -24,7 +24,8 @@ import moment from "moment"
 import Svg, { Circle } from "react-native-svg"
 import AnimateNumber from "react-native-animate-number"
 
-const BASE = "https://covid19.mathdro.id/api"
+const BASE_MATHDRO = "https://covid19.mathdro.id/api"
+const BASE_19 = "https://api.covid19api.com"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
 const { width: DEVICE_WIDTH } = Dimensions.get("window")
 const color = {
@@ -82,7 +83,7 @@ export default class Berita extends Component {
           </View>
         </Modal>
 
-        <Resource url={empty(country) ? BASE : `${BASE}/countries/${country}`}>
+        <Resource url={empty(country) ? BASE_MATHDRO : `${BASE_MATHDRO}/countries/${country}`}>
           {({ loading, error, payload: data, refetch }) => {
             if (error) return <Text>{error.message}</Text>
 
@@ -574,7 +575,7 @@ export default class Berita extends Component {
   loadCountry = async () => {
     this.setState({ loadingCountry: true })
     try {
-      let { data } = await Axios.get(`${BASE}/countries`)
+      let { data } = await Axios.get(`${BASE_MATHDRO}/countries`)
 
       this.setState({ countryList: data.countries, loadingCountry: false })
     } catch (error) {
