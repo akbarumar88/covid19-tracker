@@ -24,7 +24,8 @@ import moment from "moment"
 import Svg, { Circle } from "react-native-svg"
 import AnimateNumber from "react-native-animate-number"
 
-const BASE = "https://covid19.mathdro.id/api"
+const BASE_MATHDRO = "https://covid19.mathdro.id/api"
+const BASE_19 = "https://api.covid19api.com"
 const DEVICE_HEIGHT = Dimensions.get("window").height - StatusBar.currentHeight
 const { width: DEVICE_WIDTH } = Dimensions.get("window")
 const color = {
@@ -46,17 +47,40 @@ const color = {
 }
 
 export default class Berita extends Component {
-  state = {
-    country: "",
-    countryIso2: "WorldWide",
-    countryList: [],
-    countryModalVisible: false,
-    cariNegara: "",
-    loadingCountry: false,
+  constructor(props) {
+    super(props)
+
+    let country = props.route.params?.country ?? ""
+    let countryIso2 = props.route.params?.countryIso2 ?? "WorldWide"
+    this.state = {
+      country,
+      countryIso2,
+      countryList: [],
+      countryModalVisible: false,
+      cariNegara: "",
+      loadingCountry: false,
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    let oldParam = JSON.stringify(prevProps.route.params),
+      newParam = JSON.stringify(this.props.route.params)
+    let isSame = oldParam == newParam
+    // Jika params berubah
+    if (!isSame) {
+      this.setState({
+        country: this.props.route.params.country,
+        countryIso2: this.props.route.params.countryIso2,
+      })
+    }
   }
 
   render() {
     const { country, countryIso2 } = this.state
+    let test = empty(country)
+      ? BASE_MATHDRO
+      : `${BASE_MATHDRO}/countries/${country}`
+    console.warn(test)
     return (
       <View style={s.Container}>
         {/* Loading Progress */}
@@ -82,9 +106,40 @@ export default class Berita extends Component {
           </View>
         </Modal>
 
-        <Resource url={empty(country) ? BASE : `${BASE}/countries/${country}`}>
+        <Resource
+          url={
+            empty(country)
+              ? BASE_MATHDRO
+              : `${BASE_MATHDRO}/countries/${country}`
+          }
+        >
           {({ loading, error, payload: data, refetch }) => {
-            if (error) return <Text>{error.message}</Text>
+            if (error)
+              return (
+                <>
+                  <View style={{ alignItems: "center" }}>
+                    <Text>{error.message}</Text>
+                    <TouchableNativeFeedback
+                      onPress={() => {
+                        this.setState({
+                          country: "",
+                          countryIso2: "WorldWide",
+                        })
+                      }}
+                    >
+                      <View
+                        style={{
+                          paddingHorizontal: 16,
+                          paddingVertical: 8,
+                          backgroundColor: "#ddd",
+                        }}
+                      >
+                        <Text>Reload</Text>
+                      </View>
+                    </TouchableNativeFeedback>
+                  </View>
+                </>
+              )
 
             return (
               <ScrollView
@@ -131,9 +186,21 @@ export default class Berita extends Component {
 
                   {/* hashTag */}
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-                      <Text style={{...s.hashTag, color:'#333'}}>#SiagaCOVID19</Text>
-                      <Text style={{...s.hashTag, color:'#777',marginLeft:12}}>#DiRumahAja</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text style={{ ...s.hashTag, color: "#333" }}>
+                        #SiagaCOVID19
+                      </Text>
+                      <Text
+                        style={{ ...s.hashTag, color: "#777", marginLeft: 12 }}
+                      >
+                        #DiRumahAja
+                      </Text>
                     </View>
                   </ScrollView>
 
@@ -372,7 +439,7 @@ export default class Berita extends Component {
       : 0
     let deathPercentage = (death / total) * 100
     let recoveredPercentage = (recovered / total) * 100
-    let treatedPercentage = (treated/total)*100
+    let treatedPercentage = (treated / total) * 100
     // console.warn({ deathPercentage, recoveredPercentage })
 
     let deathMinusMargin = this.getMinusMargin(deathPercentage)
@@ -391,7 +458,7 @@ export default class Berita extends Component {
             borderColor: "#ddd",
             borderWidth: 1,
             paddingVertical: 16,
-            marginTop:12
+            marginTop: 12,
           }}
         >
           {/* Wrapper Sembuh & Kematian */}
@@ -574,7 +641,7 @@ export default class Berita extends Component {
   loadCountry = async () => {
     this.setState({ loadingCountry: true })
     try {
-      let { data } = await Axios.get(`${BASE}/countries`)
+      let { data } = await Axios.get(`${BASE_MATHDRO}/countries`)
 
       this.setState({ countryList: data.countries, loadingCountry: false })
     } catch (error) {
@@ -665,8 +732,8 @@ const s = StyleSheet.create({
     fontFamily: "sans-serif-light",
   },
   hashTag: {
-    fontWeight:'bold',
+    fontWeight: "bold",
     // fontFamily: "sans-serif-light",
-    fontSize: 32
-  }
+    fontSize: 32,
+  },
 })
