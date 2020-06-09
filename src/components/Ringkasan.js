@@ -77,10 +77,6 @@ export default class Berita extends Component {
 
   render() {
     const { country, countryIso2 } = this.state
-    let test = empty(country)
-      ? BASE_MATHDRO
-      : `${BASE_MATHDRO}/countries/${country}`
-    console.warn(test)
     return (
       <View style={s.Container}>
         {/* Loading Progress */}
