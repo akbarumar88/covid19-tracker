@@ -13,6 +13,7 @@ import {
   ToastAndroid,
   Modal as RNModal,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native"
 import Resource from "../api/Resource"
 import { empty, toCurrency } from "../functions/Functions"
@@ -91,6 +92,12 @@ export default class Berita extends Component {
             Sumber: WHO, CDC, ECDC, NHC of the PRC, JHU CSSE, DXY, QQ, dan
             berbagai media internasional
           </Text>
+
+          <Text style={{ color: "#999", marginTop: 8 }}>
+            Hint:{"\n"}
+            1. Klik pada heading kolom untuk mengurutkan{"\n"}
+            2. Klik pada nama negara untuk info lebih lanjut
+          </Text>
         </View>
 
         {/* Tabel */}
@@ -100,7 +107,7 @@ export default class Berita extends Component {
   }
 
   renderRanking = () => {
-    const { sortBy } = this.state
+    const { sortBy, order } = this.state
 
     let sortByCountry = sortBy == "Country"
     let sortByConfirmed = sortBy == "TotalConfirmed"
@@ -121,7 +128,7 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.country}>Negara</Text>
-              {sortByCountry ? <Text>(ASC)</Text> : null}
+              {sortByCountry ? <Text>({order.toUpperCase()})</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
@@ -136,7 +143,7 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.number}>Terdampak</Text>
-              {sortByConfirmed ? <Text>(ASC)</Text> : null}
+              {sortByConfirmed ? <Text>({order.toUpperCase()})</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
@@ -151,7 +158,7 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.number}>Sembuh</Text>
-              {sortByRecovered ? <Text>(ASC)</Text> : null}
+              {sortByRecovered ? <Text>({order.toUpperCase()})</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
@@ -164,7 +171,7 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.number}>Meninggal</Text>
-              {sortByDeath ? <Text>(ASC)</Text> : null}
+              {sortByDeath ? <Text>({order.toUpperCase()})</Text> : null}
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -172,7 +179,25 @@ export default class Berita extends Component {
         {/* IIFE, define function, langsung dipanggil ditempat */}
         {(() => {
           const { error, loading, sorting } = this.state
-          if (error) return <Text>{error.message}</Text>
+          if (error)
+            return (
+              <>
+                <View style={{ alignItems: "center" }}>
+                  <Text>{error.message}</Text>
+                  <TouchableNativeFeedback onPress={() => this.fetch()}>
+                    <View
+                      style={{
+                        paddingHorizontal: 16,
+                        paddingVertical: 8,
+                        backgroundColor: "#ddd",
+                      }}
+                    >
+                      <Text>Reload</Text>
+                    </View>
+                  </TouchableNativeFeedback>
+                </View>
+              </>
+            )
           if (loading || sorting)
             return (
               <View
@@ -198,17 +223,29 @@ export default class Berita extends Component {
                         alignItems: "stretch",
                       }}
                     >
-                      <View
+                      <TouchableOpacity
                         style={{
                           flex: 1,
                           ...s.cellWrap,
-                          ...s.row,
-                          justifyContent: "flex-start",
+                          alignItems: "flex-start",
                         }}
+                        onPress={() =>
+                          this.props.navigation.navigate("Ringkasan", {
+                            country: country.Country,
+                            countryIso2: country.CountryCode,
+                          })
+                        }
                       >
-                        <Flag code={country.CountryCode} size={16} />
-                        <Text style={s.country}>{country.Country}</Text>
-                      </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            ...s.row,
+                          }}
+                        >
+                          <Flag code={country.CountryCode} size={16} />
+                          <Text style={s.country}>{country.Country}</Text>
+                        </View>
+                      </TouchableOpacity>
 
                       <View style={{ flex: 1, ...s.cellWrap }}>
                         <Text style={s.number}>
