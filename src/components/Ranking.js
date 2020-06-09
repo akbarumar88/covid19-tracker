@@ -12,6 +12,7 @@ import {
   StatusBar,
   ToastAndroid,
   Modal as RNModal,
+  TouchableWithoutFeedback
 } from "react-native"
 import Resource from "../api/Resource"
 import { empty, toCurrency } from "../functions/Functions"
@@ -51,7 +52,10 @@ export default class Berita extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {}
+    this.state = {
+      sortBy: '',
+      sorting: false
+    }
   }
 
   render() {
@@ -78,27 +82,79 @@ export default class Berita extends Component {
   }
 
   renderRanking = () => {
+    const {sortBy} = this.state
+
+    let sortByCountry = sortBy == "Country"
+    let sortByConfirmed = sortBy == "TotalConfirmed"
+    let sortByRecovered = sortBy == "TotalRecovered"
+    let sortByDeath = sortBy == "TotalDeaths"
     return (
       <>
         {/* Heading */}
         <View
           style={{ ...s.row, alignItems: "stretch", paddingHorizontal: 12 }}
         >
-          <View style={{ flex: 1, ...s.cellWrap }}>
-            <Text style={s.country}>Negara</Text>
-          </View>
+          <TouchableWithoutFeedback
+            onPress={() => this.sortBy("Country")}
+          >
+            <View
+              style={{
+                flex: 1,
+                ...s.cellWrap,
+                backgroundColor: sortByCountry ? "#eee" : "#fff",
+              }}
+            >
+              <Text style={s.country}>Negara</Text>
+            {sortByCountry?<Text>(ASC)</Text>:null}
+            </View>
+          </TouchableWithoutFeedback>
 
-          <View style={{ flex: 1, ...s.cellWrap }}>
-            <Text style={s.number}>Terdampak</Text>
-          </View>
+          <TouchableWithoutFeedback
+            onPress={() => this.sortBy("TotalConfirmed")}
+          >
+            <View
+              style={{
+                flex: 1,
+                ...s.cellWrap,
+                backgroundColor:
+                  sortByConfirmed ? "#eee" : "#fff",
+              }}
+            >
+              <Text style={s.number}>Terdampak</Text>
+              {sortByConfirmed?<Text>(ASC)</Text>:null}
+            </View>
+          </TouchableWithoutFeedback>
 
-          <View style={{ flex: 1, ...s.cellWrap }}>
-            <Text style={s.number}>Sembuh</Text>
-          </View>
+          <TouchableWithoutFeedback
+            onPress={() => this.sortBy("TotalRecovered")}
+          >
+            <View
+              style={{
+                flex: 1,
+                ...s.cellWrap,
+                backgroundColor:
+                  sortByRecovered ? "#eee" : "#fff",
+              }}
+            >
+              <Text style={s.number}>Sembuh</Text>
+              {sortByRecovered?<Text>(ASC)</Text>:null}
+            </View>
+          </TouchableWithoutFeedback>
 
-          <View style={{ flex: 1, ...s.cellWrap }}>
-            <Text style={s.number}>Meninggal</Text>
-          </View>
+          <TouchableWithoutFeedback
+            onPress={() => this.sortBy("TotalDeaths")}
+          >
+            <View
+              style={{
+                flex: 1,
+                ...s.cellWrap,
+                backgroundColor: sortByDeath ? "#eee" : "#fff",
+              }}
+            >
+              <Text style={s.number}>Meninggal</Text>
+              {sortByDeath?<Text>(ASC)</Text>:null}
+            </View>
+          </TouchableWithoutFeedback>
         </View>
 
         <Resource url={`${BASE_19}/summary`}>
@@ -114,11 +170,18 @@ export default class Berita extends Component {
                     justifyContent: "center",
                   }}
                 >
-                  <ActivityIndicator size={70} color={color.teal} />
+                  <ActivityIndicator size={50} color={color.teal} />
                 </View>
               )
 
             let countries = data.Countries
+            countries.sort((a, b) => {
+              const { sortBy } = this.state
+              if (a[sortBy] < b[sortBy]) return -1
+              if (a[sortBy] > b[sortBy]) return 1
+              return 0
+            })
+            if (this.state.sorting) this.setState({sorting:false})
             return (
               <ScrollView style={{ paddingHorizontal: 12 }}>
                 <View style={{ paddingBottom: 12 }}>
@@ -170,6 +233,10 @@ export default class Berita extends Component {
       </>
     )
   }
+
+  sortBy=(col)=>{
+    this.setState({sortBy:col, sorting:true})
+  }
 }
 
 const s = StyleSheet.create({
@@ -213,5 +280,6 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     justifyContent: "center",
+    alignItems:'center'
   },
 })
