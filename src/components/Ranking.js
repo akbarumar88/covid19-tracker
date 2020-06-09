@@ -218,6 +218,7 @@ export default class Berita extends Component {
                 {countries.map((country, index) => {
                   return (
                     <View
+                      key={`${index}`}
                       style={{
                         ...s.row,
                         alignItems: "stretch",

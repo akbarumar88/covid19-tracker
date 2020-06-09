@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text} from 'react-native';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {Berita, Ranking, Ringkasan} from './CompStack';
+import {Tips, Ranking, Ringkasan} from './CompStack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -43,11 +43,11 @@ export default class Home extends Component {
           options={{
             tabBarColor: '#009688',
             tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons name="newspaper" color="#fff" size={24} />
-            ),
+              <MaterialCommunityIcons name="lightbulb-on" color="#fff" size={24} />
+            )
           }}
-          name={'Berita'}
-          component={Berita}
+          name={'Tips'}
+          component={Tips}
         />
       </Tab.Navigator>
     );
