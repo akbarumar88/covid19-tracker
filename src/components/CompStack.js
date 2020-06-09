@@ -1,9 +1,9 @@
-import Berita from './Berita'
+import Tips from './Tips'
 import Ranking from './Ranking'
 import Ringkasan from './Ringkasan'
 
 export {
-    Berita,
+    Tips,
     Ranking,
     Ringkasan
 }
