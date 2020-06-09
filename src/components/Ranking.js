@@ -71,7 +71,7 @@ export default class Berita extends Component {
     this.setState({ loading: true })
     try {
       let { data } = await Axios.get(`${BASE_19}/summary`)
-      this.setState({ loading: false, countries: data.Countries })
+      this.setState({ loading: false, countries: data.Countries, error: false })
     } catch (error) {
       this.setState({ loading: false, error })
     }
