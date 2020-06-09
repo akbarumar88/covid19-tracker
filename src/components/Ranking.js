@@ -12,7 +12,7 @@ import {
   StatusBar,
   ToastAndroid,
   Modal as RNModal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native"
 import Resource from "../api/Resource"
 import { empty, toCurrency } from "../functions/Functions"
@@ -53,8 +53,26 @@ export default class Berita extends Component {
     super(props)
 
     this.state = {
-      sortBy: '',
-      sorting: false
+      sortBy: "",
+      sorting: false,
+      countries: [],
+      loading: true,
+      error: false,
+      order: "asc",
+    }
+  }
+
+  async componentDidMount() {
+    this.fetch()
+  }
+
+  fetch = async () => {
+    this.setState({ loading: true })
+    try {
+      let { data } = await Axios.get(`${BASE_19}/summary`)
+      this.setState({ loading: false, countries: data.Countries })
+    } catch (error) {
+      this.setState({ loading: false, error })
     }
   }
 
@@ -82,7 +100,7 @@ export default class Berita extends Component {
   }
 
   renderRanking = () => {
-    const {sortBy} = this.state
+    const { sortBy } = this.state
 
     let sortByCountry = sortBy == "Country"
     let sortByConfirmed = sortBy == "TotalConfirmed"
@@ -94,9 +112,7 @@ export default class Berita extends Component {
         <View
           style={{ ...s.row, alignItems: "stretch", paddingHorizontal: 12 }}
         >
-          <TouchableWithoutFeedback
-            onPress={() => this.sortBy("Country")}
-          >
+          <TouchableWithoutFeedback onPress={() => this.sortBy("Country")}>
             <View
               style={{
                 flex: 1,
@@ -105,7 +121,7 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.country}>Negara</Text>
-            {sortByCountry?<Text>(ASC)</Text>:null}
+              {sortByCountry ? <Text>(ASC)</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
@@ -116,12 +132,11 @@ export default class Berita extends Component {
               style={{
                 flex: 1,
                 ...s.cellWrap,
-                backgroundColor:
-                  sortByConfirmed ? "#eee" : "#fff",
+                backgroundColor: sortByConfirmed ? "#eee" : "#fff",
               }}
             >
               <Text style={s.number}>Terdampak</Text>
-              {sortByConfirmed?<Text>(ASC)</Text>:null}
+              {sortByConfirmed ? <Text>(ASC)</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
@@ -132,18 +147,15 @@ export default class Berita extends Component {
               style={{
                 flex: 1,
                 ...s.cellWrap,
-                backgroundColor:
-                  sortByRecovered ? "#eee" : "#fff",
+                backgroundColor: sortByRecovered ? "#eee" : "#fff",
               }}
             >
               <Text style={s.number}>Sembuh</Text>
-              {sortByRecovered?<Text>(ASC)</Text>:null}
+              {sortByRecovered ? <Text>(ASC)</Text> : null}
             </View>
           </TouchableWithoutFeedback>
 
-          <TouchableWithoutFeedback
-            onPress={() => this.sortBy("TotalDeaths")}
-          >
+          <TouchableWithoutFeedback onPress={() => this.sortBy("TotalDeaths")}>
             <View
               style={{
                 flex: 1,
@@ -152,90 +164,103 @@ export default class Berita extends Component {
               }}
             >
               <Text style={s.number}>Meninggal</Text>
-              {sortByDeath?<Text>(ASC)</Text>:null}
+              {sortByDeath ? <Text>(ASC)</Text> : null}
             </View>
           </TouchableWithoutFeedback>
         </View>
 
-        <Resource url={`${BASE_19}/summary`}>
-          {({ loading, error, payload: data, refetch }) => {
-            // console.warn(data.Countries)
-            if (error) return <Text>{error.message}</Text>
-            if (loading)
-              return (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ActivityIndicator size={50} color={color.teal} />
-                </View>
-              )
-
-            let countries = data.Countries
-            countries.sort((a, b) => {
-              const { sortBy } = this.state
-              if (a[sortBy] < b[sortBy]) return -1
-              if (a[sortBy] > b[sortBy]) return 1
-              return 0
-            })
-            if (this.state.sorting) this.setState({sorting:false})
+        {/* IIFE, define function, langsung dipanggil ditempat */}
+        {(() => {
+          const { error, loading, sorting } = this.state
+          if (error) return <Text>{error.message}</Text>
+          if (loading || sorting)
             return (
-              <ScrollView style={{ paddingHorizontal: 12 }}>
-                <View style={{ paddingBottom: 12 }}>
-                  {countries.map((country, index) => {
-                    return (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ActivityIndicator size={50} color={color.teal} />
+              </View>
+            )
+
+          let countries = this.state.countries
+          return (
+            <ScrollView style={{ paddingHorizontal: 12 }}>
+              <View style={{ paddingBottom: 12 }}>
+                {countries.map((country, index) => {
+                  return (
+                    <View
+                      style={{
+                        ...s.row,
+                        alignItems: "stretch",
+                      }}
+                    >
                       <View
                         style={{
+                          flex: 1,
+                          ...s.cellWrap,
                           ...s.row,
-                          alignItems: "stretch",
+                          justifyContent: "flex-start",
                         }}
                       >
-                        <View
-                          style={{
-                            flex: 1,
-                            ...s.cellWrap,
-                            ...s.row,
-                            justifyContent: "flex-start",
-                          }}
-                        >
-                          <Flag code={country.CountryCode} size={16} />
-                          <Text style={s.country}>{country.Country}</Text>
-                        </View>
-
-                        <View style={{ flex: 1, ...s.cellWrap }}>
-                          <Text style={s.number}>
-                            {toCurrency(country.TotalConfirmed)}
-                          </Text>
-                        </View>
-
-                        <View style={{ flex: 1, ...s.cellWrap }}>
-                          <Text style={s.number}>
-                            {toCurrency(country.TotalRecovered)}
-                          </Text>
-                        </View>
-
-                        <View style={{ flex: 1, ...s.cellWrap }}>
-                          <Text style={s.number}>
-                            {toCurrency(country.TotalDeaths)}
-                          </Text>
-                        </View>
+                        <Flag code={country.CountryCode} size={16} />
+                        <Text style={s.country}>{country.Country}</Text>
                       </View>
-                    )
-                  })}
-                </View>
-              </ScrollView>
-            )
-          }}
-        </Resource>
+
+                      <View style={{ flex: 1, ...s.cellWrap }}>
+                        <Text style={s.number}>
+                          {toCurrency(country.TotalConfirmed)}
+                        </Text>
+                      </View>
+
+                      <View style={{ flex: 1, ...s.cellWrap }}>
+                        <Text style={s.number}>
+                          {toCurrency(country.TotalRecovered)}
+                        </Text>
+                      </View>
+
+                      <View style={{ flex: 1, ...s.cellWrap }}>
+                        <Text style={s.number}>
+                          {toCurrency(country.TotalDeaths)}
+                        </Text>
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+            </ScrollView>
+          )
+        })()}
       </>
     )
   }
 
-  sortBy=(col)=>{
-    this.setState({sortBy:col, sorting:true})
+  sortBy = newSortBy => {
+    const { countries, sortBy: oldSortBy, order: oldOrder } = this.state
+
+    this.setState({ sortBy: newSortBy, sorting: true })
+    let sorted = [],
+      newOrder
+    if (newSortBy == oldSortBy) {
+      // toggle order (asc, desc)
+      // Dibalik ordernya asc -> desc, desc -> asc
+      newOrder = oldOrder == "asc" ? "desc" : "asc"
+    } else {
+      // beda kolom, sort biasa, order tetap
+      newOrder = oldOrder
+    }
+    let lessThan = newOrder == "asc" ? -1 : 1
+    let greaterThan = newOrder == "asc" ? 1 : -1
+    sorted = [...countries].sort((a, b) => {
+      if (a[newSortBy] < b[newSortBy]) return lessThan
+      if (a[newSortBy] > b[newSortBy]) return greaterThan
+      return 0
+    })
+
+    this.setState({ sorting: false, countries: sorted, order: newOrder })
   }
 }
 
@@ -280,6 +305,6 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
     justifyContent: "center",
-    alignItems:'center'
+    alignItems: "center",
   },
 })
