@@ -28,8 +28,8 @@ export default class Limiter extends Component {
   render() {
     return (
       <FlatList
-        style={this.props.style}
-        key={(item, index) => index}
+        contentContainerStyle={this.props.style}
+        keyExtractor={(item, index) => index}
         data={this.state.displayData}
         renderItem={this.props.renderItem}
         onEndReached={this.fetchMore}
@@ -43,7 +43,7 @@ export default class Limiter extends Component {
     let newFetched = rawData.filter((item, index) => {
       return index >= newOffset && index < newOffset + limit
     })
-    console.warn({offset:newOffset,limit: newOffset+limit, newFetched:newFetched.length})
+    console.log({offset:newOffset,limit: newOffset+limit, newFetched:newFetched.length})
 
     this.setState(s => ({ displayData: [...s.displayData, ...newFetched] }))
   }
