@@ -25,6 +25,7 @@ import Flag from "react-native-flags"
 import moment from "moment"
 import Svg, { Circle } from "react-native-svg"
 import AnimateNumber from "react-native-animate-number"
+import Limiter from "../reusable_components/Limiter"
 
 const BASE_MATHDRO = "https://covid19.mathdro.id/api"
 const BASE_19 = "https://api.covid19api.com"
@@ -49,7 +50,7 @@ const color = {
   teal: "#2196F3",
 }
 
-export default class Berita extends Component {
+export default class Ranking extends Component {
   constructor(props) {
     super(props)
 
@@ -213,7 +214,14 @@ export default class Berita extends Component {
 
           let countries = this.state.countries
           return (
-            <ScrollView style={{ paddingHorizontal: 12 }}>
+            <>
+              <Limiter
+                style={{ paddingHorizontal: 12 }}
+                data={countries}
+                limit={15}
+                renderItem={this.renderCountry}
+              />
+              {/* <ScrollView style={{ paddingHorizontal: 12 }}>
               <View style={{ paddingBottom: 12 }}>
                 {countries.map((country, index) => {
                   return (
@@ -269,10 +277,59 @@ export default class Berita extends Component {
                   )
                 })}
               </View>
-            </ScrollView>
+            </ScrollView> */}
+            </>
           )
         })()}
       </>
+    )
+  }
+
+  renderCountry = ({ item: country, index }) => {
+    return (
+      <View
+        key={`${index}`}
+        style={{
+          ...s.row,
+          alignItems: "stretch",
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            ...s.cellWrap,
+            alignItems: "flex-start",
+          }}
+          onPress={() =>
+            this.props.navigation.navigate("Ringkasan", {
+              country: country.Country,
+              countryIso2: country.CountryCode,
+            })
+          }
+        >
+          <View
+            style={{
+              flex: 1,
+              ...s.row,
+            }}
+          >
+            <Flag code={country.CountryCode} size={16} />
+            <Text style={s.country}>{country.Country}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <View style={{ flex: 1, ...s.cellWrap }}>
+          <Text style={s.number}>{toCurrency(country.TotalConfirmed)}</Text>
+        </View>
+
+        <View style={{ flex: 1, ...s.cellWrap }}>
+          <Text style={s.number}>{toCurrency(country.TotalRecovered)}</Text>
+        </View>
+
+        <View style={{ flex: 1, ...s.cellWrap }}>
+          <Text style={s.number}>{toCurrency(country.TotalDeaths)}</Text>
+        </View>
+      </View>
     )
   }
 
