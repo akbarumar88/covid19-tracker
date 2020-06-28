@@ -216,7 +216,7 @@ export default class Ranking extends Component {
           return (
             <>
               <Limiter
-                style={{ paddingHorizontal: 12, paddingBottom: 12 }}
+                style={{ paddingHorizontal: 12 }}
                 data={countries}
                 limit={15}
                 renderItem={this.renderCountry}

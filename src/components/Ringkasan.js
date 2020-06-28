@@ -23,6 +23,7 @@ import Flag from "react-native-flags"
 import moment from "moment"
 import Svg, { Circle } from "react-native-svg"
 import AnimateNumber from "react-native-animate-number"
+import Limiter from '../reusable_components/Limiter';
 
 const BASE_MATHDRO = "https://covid19.mathdro.id/api"
 const BASE_19 = "https://api.covid19api.com"
@@ -375,51 +376,19 @@ export default class Berita extends Component {
             />
           </View>
 
-          <ScrollView>
+          <Limiter
+            data={[{ name: "Global", iso2: "WorldWide" }, ...negaraSearch]}
+            limit={15}
+            renderItem={this.renderCountry}
+          />
+
+          {/* <ScrollView>
             {[{ name: "Global", iso2: "WorldWide" }, ...negaraSearch].map(
               neg => {
-                return (
-                  <TouchableNativeFeedback
-                    onPress={() => this.setNegara(neg)}
-                    key={neg.iso2}
-                  >
-                    <View style={s.listNegara}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Flag code={neg.iso2} size={24} />
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: "#444",
-                            marginLeft: 8,
-                          }}
-                        >
-                          {neg.name} - {neg.iso2}
-                        </Text>
-                      </View>
-
-                      {/* Kalo Selected */}
-                      {neg.iso2 == this.state.countryIso2 &&
-                      !empty(neg.iso2) ? (
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            color: "#999",
-                          }}
-                        >
-                          (Current)
-                        </Text>
-                      ) : null}
-                    </View>
-                  </TouchableNativeFeedback>
-                )
+                
               }
             )}
-          </ScrollView>
+          </ScrollView> */}
         </View>
       </Modal>
     )
@@ -601,6 +570,48 @@ export default class Berita extends Component {
           </View>
         </View>
       </>
+    )
+  }
+
+  renderCountry = ({item:neg, index}) => {
+    return (
+      <TouchableNativeFeedback
+        onPress={() => this.setNegara(neg)}
+        key={neg.iso2}
+      >
+        <View style={s.listNegara}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Flag code={neg.iso2} size={24} />
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#444",
+                marginLeft: 8,
+              }}
+            >
+              {neg.name} - {neg.iso2}
+            </Text>
+          </View>
+
+          {/* Kalo Selected */}
+          {neg.iso2 == this.state.countryIso2 &&
+          !empty(neg.iso2) ? (
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#999",
+              }}
+            >
+              (Current)
+            </Text>
+          ) : null}
+        </View>
+      </TouchableNativeFeedback>
     )
   }
 
