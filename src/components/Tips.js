@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { View, Text, StyleSheet } from "react-native"
 import Collapsible from "react-native-collapsible"
 import {
-  TouchableNativeFeedback,
+  TouchableWithoutFeedback,
   ScrollView,
 } from "react-native-gesture-handler"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
@@ -141,7 +141,7 @@ export default class Tips extends Component {
                   borderBottomColor: "#e7e7e7",
                 }}
               >
-                <TouchableNativeFeedback
+                <TouchableWithoutFeedback
                   onPress={() => {
                     let newOpened = isOpen ? "" : tip.slug
                     this.setState({ opened: newOpened })
@@ -165,7 +165,7 @@ export default class Tips extends Component {
                       color="#009688"
                     />
                   </View>
-                </TouchableNativeFeedback>
+                </TouchableWithoutFeedback>
 
                 <Collapsible collapsed={!isOpen}>
                   <View style={s.contentWrap}>
@@ -218,7 +218,7 @@ export default class Tips extends Component {
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f7f7f7",
+    backgroundColor: "#fff",
   },
   row: {
     flexDirection: "row",

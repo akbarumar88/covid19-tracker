@@ -658,7 +658,7 @@ export default class Berita extends Component {
 
 const s = StyleSheet.create({
   Container: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     flex: 1,
   },
   tAngkaBesar: {

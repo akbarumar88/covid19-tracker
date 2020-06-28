@@ -17,6 +17,7 @@ export default class Limiter extends Component {
     let currentPropsStr = JSON.stringify(this.props)
 
     if (prevPropsStr != currentPropsStr) {
+      console.log('reset donk');
       this.setState({
         rawData: this.props.data,
         limit: this.props.limit,
