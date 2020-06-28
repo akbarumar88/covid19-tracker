@@ -25,6 +25,7 @@ import Flag from "react-native-flags"
 import moment from "moment"
 import Svg, { Circle } from "react-native-svg"
 import AnimateNumber from "react-native-animate-number"
+import Limiter from "../reusable_components/Limiter"
 
 const BASE_MATHDRO = "https://covid19.mathdro.id/api"
 const BASE_19 = "https://api.covid19api.com"
@@ -49,7 +50,7 @@ const color = {
   teal: "#2196F3",
 }
 
-export default class Berita extends Component {
+export default class Ranking extends Component {
   constructor(props) {
     super(props)
 
@@ -213,66 +214,122 @@ export default class Berita extends Component {
 
           let countries = this.state.countries
           return (
-            <ScrollView style={{ paddingHorizontal: 12 }}>
-              <View style={{ paddingBottom: 12 }}>
-                {countries.map((country, index) => {
-                  return (
-                    <View
-                      key={`${index}`}
-                      style={{
-                        ...s.row,
-                        alignItems: "stretch",
-                      }}
-                    >
-                      <TouchableOpacity
-                        style={{
-                          flex: 1,
-                          ...s.cellWrap,
-                          alignItems: "flex-start",
-                        }}
-                        onPress={() =>
-                          this.props.navigation.navigate("Ringkasan", {
-                            country: country.Country,
-                            countryIso2: country.CountryCode,
-                          })
-                        }
-                      >
-                        <View
-                          style={{
-                            flex: 1,
-                            ...s.row,
-                          }}
-                        >
-                          <Flag code={country.CountryCode} size={16} />
-                          <Text style={s.country}>{country.Country}</Text>
-                        </View>
-                      </TouchableOpacity>
-
-                      <View style={{ flex: 1, ...s.cellWrap }}>
-                        <Text style={s.number}>
-                          {toCurrency(country.TotalConfirmed)}
-                        </Text>
-                      </View>
-
-                      <View style={{ flex: 1, ...s.cellWrap }}>
-                        <Text style={s.number}>
-                          {toCurrency(country.TotalRecovered)}
-                        </Text>
-                      </View>
-
-                      <View style={{ flex: 1, ...s.cellWrap }}>
-                        <Text style={s.number}>
-                          {toCurrency(country.TotalDeaths)}
-                        </Text>
-                      </View>
-                    </View>
-                  )
-                })}
-              </View>
-            </ScrollView>
+            <>
+              <Limiter
+                style={{ paddingHorizontal: 12, paddingBottom: 12 }}
+                data={countries}
+                limit={15}
+                renderItem={this.renderCountry}
+              />
+            </>
           )
         })()}
       </>
+    )
+  }
+
+  renderCountry = ({ item: country, index }) => {
+    return (
+      <View
+        key={`${index}`}
+        style={{
+          alignItems: "stretch",
+          marginBottom: 16,
+          borderRightWidth: 1,
+          borderTopWidth:1,
+          borderColor:'#f3f3f3'
+        }}
+      >
+        {/* Negara */}
+        <View
+          style={{
+            ...s.row,
+            ...{ alignItems: "stretch" },
+            ...s.columnWrapper,
+          }}
+        >
+          <View style={s.columnName}>
+            <Text style={s.columnNameText}>Negara</Text>
+          </View>
+
+          <TouchableOpacity
+            style={{
+              ...s.columnValue,
+              alignItems: "flex-start",
+            }}
+            onPress={() =>
+              this.props.navigation.navigate("Ringkasan", {
+                country: country.Country,
+                countryIso2: country.CountryCode,
+              })
+            }
+          >
+            <View
+              style={{
+                flex: 1,
+                ...s.row,
+              }}
+            >
+              <Flag code={country.CountryCode} size={16} />
+              <Text style={s.country}>{country.Country}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        {/* Terdampak */}
+        <View
+          style={{
+            ...s.row,
+            ...{ alignItems: "stretch" },
+            ...s.columnWrapper,
+          }}
+        >
+          <View style={s.columnName}>
+            <Text style={s.columnNameText}>Terdampak</Text>
+          </View>
+
+          <View style={{ ...s.columnValue }}>
+            <Text style={{ ...s.number, textAlign: "left" }}>
+              {toCurrency(country.TotalConfirmed)}
+            </Text>
+          </View>
+        </View>
+        {/* Sembuh */}
+        <View
+          style={{
+            ...s.row,
+            ...{ alignItems: "stretch" },
+            ...s.columnWrapper,
+          }}
+        >
+          <View style={s.columnName}>
+            <Text style={s.columnNameText}>Sembuh</Text>
+          </View>
+
+          <View style={{ ...s.columnValue }}>
+            <Text style={{ ...s.number, textAlign: "left" }}>
+              {toCurrency(country.TotalRecovered)}
+            </Text>
+          </View>
+        </View>
+        {/* Meninggal */}
+        <View
+          style={{
+            ...s.row,
+            ...{ alignItems: "stretch" },
+            ...s.columnWrapper,
+          }}
+        >
+          <View style={s.columnName}>
+            <Text style={s.columnNameText}>Meninggal</Text>
+          </View>
+
+          <View style={{ ...s.columnValue }}>
+            <Text style={{ ...s.number, textAlign: "left" }}>
+              {toCurrency(country.TotalDeaths)}
+            </Text>
+          </View>
+        </View>
+      </View>
     )
   }
 
@@ -304,7 +361,7 @@ export default class Berita extends Component {
 
 const s = StyleSheet.create({
   Container: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#fff",
     flex: 1,
   },
   row: {
@@ -345,4 +402,22 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  columnWrapper: {
+    borderBottomWidth:1,
+    borderBottomColor:'#f3f3f3'
+  },
+  columnName: {
+    flex: 0.3,
+    backgroundColor: '#f9f9f9',
+    padding: 8
+  },
+  columnNameText: {
+    fontWeight:'bold',
+    fontFamily: 'sans-serif-light'
+  },
+  columnValue: {
+    flex: 0.7,
+    backgroundColor: '#fff',
+    padding: 8
+  }
 })
