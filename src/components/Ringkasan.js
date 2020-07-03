@@ -63,17 +63,16 @@ export default class Berita extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    let oldParam = JSON.stringify(prevProps.route.params),
-      newParam = JSON.stringify(this.props.route.params)
-    let isSame = oldParam == newParam
-    // Jika params berubah
-    if (!isSame) {
-      this.setState({
-        country: this.props.route.params.country,
-        countryIso2: this.props.route.params.countryIso2,
-      })
-    }
+  static getDerivedStateFromProps(newProps, state) {
+    if (!newProps.route.params) return null
+
+    if (newProps.route.params.countryIso2 != state.countryIso2)
+      return {
+        country: newProps.route.params.country,
+        countryIso2: newProps.route.params.countryIso2,
+      }
+
+    return null
   }
 
   render() {
